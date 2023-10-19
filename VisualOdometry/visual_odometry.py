@@ -6,6 +6,7 @@ import cv2
 # from lib.visualization.video import play_trip
 
 from tqdm import tqdm
+import os
 
 
 class VisualOdometry():
@@ -225,6 +226,10 @@ class VisualOdometry():
 
 def main():
     data_dir = "video"  # Try KITTI_sequence_2 too
+    os.system(f"rm -r {data_dir}/images")
+    os.system(f"mkdir {data_dir}/images")
+    os.system(f"ffmpeg -i {data_dir}/input.MOV -qscale:v 1 -qmin 1 -vf \"fps=2\" {data_dir}/images/%04d.jpg")
+
     vo = VisualOdometry(data_dir)
 
     # play_trip(vo.images)  # Comment out to not play the trip
@@ -233,14 +238,22 @@ def main():
     estimated_path = []
     # for i, gt_pose in enumerate(tqdm(vo.gt_poses, unit="pose")):
     for i in range(len(vo.images)):
-        if i == 0:
-            cur_pose = vo.gt_poses[0]
-        else:
-            q1, q2 = vo.get_matches(i)
-            transf = vo.get_pose(q1, q2)
-            cur_pose = np.matmul(cur_pose, np.linalg.inv(transf))
-        # gt_path.append((gt_pose[0, 3], gt_pose[2, 3]))
-        estimated_path.append((cur_pose[0, 3], cur_pose[2, 3]))
+        try:
+            print(i)
+            if i == 0:
+                cur_pose = vo.gt_poses[0]
+            else:
+                q1, q2 = vo.get_matches(i)
+                transf = vo.get_pose(q1, q2)
+                cur_pose = np.matmul(cur_pose, np.linalg.inv(transf))
+            # gt_path.append((gt_pose[0, 3], gt_pose[2, 3]))
+            estimated_path.append((cur_pose[0, 3], cur_pose[2, 3]))
+            print(type(cur_pose))
+            print(cur_pose)
+            print()
+        except:
+          print(f"error in frame {i}")
+          print("#################################33")
     # plotting.visualize_paths(gt_path, estimated_path, "Visual Odometry", file_out=os.path.basename(data_dir) + ".html")
 
 
