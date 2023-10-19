@@ -232,7 +232,7 @@ def main():
     # gt_path = []
     estimated_path = []
     # for i, gt_pose in enumerate(tqdm(vo.gt_poses, unit="pose")):
-    for i in range(len(vo.images))
+    for i in range(len(vo.images)):
         if i == 0:
             cur_pose = vo.gt_poses[0]
         else:
