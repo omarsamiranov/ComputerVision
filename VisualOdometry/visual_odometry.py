@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cv2
+import json
 
 # from lib.visualization import plotting
 # from lib.visualization.video import play_trip
@@ -75,6 +76,7 @@ class VisualOdometry():
         images (list): grayscale images
         """
         image_paths = [os.path.join(filepath, file) for file in sorted(os.listdir(filepath))]
+        self.image_paths = image_paths
         return [cv2.imread(path, cv2.IMREAD_GRAYSCALE) for path in image_paths]
 
     @staticmethod
@@ -246,6 +248,7 @@ def main():
     # gt_path = []
     estimated_path = []
     # for i, gt_pose in enumerate(tqdm(vo.gt_poses, unit="pose")):
+    res = []
     for i in range(len(vo.images)):
         try:
             print(i)
@@ -261,9 +264,18 @@ def main():
             print(cur_pose)
             print(f"sharpness: {sharpness(vo.images[i])}")
             print()
+            res.append({
+                "file_path": f"{vo.image_paths[i]}",
+                "sharpness": sharpness(vo.images[i]),
+                "transform_matrix": cur_pose.tolist()
+            })
         except:
           print(f"error in frame {i}")
           print("#################################33")
+
+    res = {"frames": res}
+    with open('transforms.json', 'w') as f:
+        json.dump(res, f)
     # plotting.visualize_paths(gt_path, estimated_path, "Visual Odometry", file_out=os.path.basename(data_dir) + ".html")
 
 
