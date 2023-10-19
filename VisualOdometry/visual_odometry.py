@@ -2,8 +2,8 @@ import os
 import numpy as np
 import cv2
 
-from lib.visualization import plotting
-from lib.visualization.video import play_trip
+# from lib.visualization import plotting
+# from lib.visualization.video import play_trip
 
 from tqdm import tqdm
 
@@ -12,7 +12,7 @@ class VisualOdometry():
     def __init__(self, data_dir):
         self.K, self.P = self._load_calib(os.path.join(data_dir, 'calib.txt'))
         self.gt_poses = self._load_poses(os.path.join(data_dir,"poses.txt"))
-        self.images = self._load_images(os.path.join(data_dir,"image_l"))
+        self.images = self._load_images(os.path.join(data_dir,"images"))
         self.orb = cv2.ORB_create(3000)
         FLANN_INDEX_LSH = 6
         index_params = dict(algorithm=FLANN_INDEX_LSH, table_number=6, key_size=12, multi_probe_level=1)
@@ -224,23 +224,24 @@ class VisualOdometry():
 
 
 def main():
-    data_dir = "KITTI_sequence_2"  # Try KITTI_sequence_2 too
+    data_dir = "video"  # Try KITTI_sequence_2 too
     vo = VisualOdometry(data_dir)
 
-    play_trip(vo.images)  # Comment out to not play the trip
+    # play_trip(vo.images)  # Comment out to not play the trip
 
-    gt_path = []
+    # gt_path = []
     estimated_path = []
-    for i, gt_pose in enumerate(tqdm(vo.gt_poses, unit="pose")):
+    # for i, gt_pose in enumerate(tqdm(vo.gt_poses, unit="pose")):
+    for i in range(len(vo.images))
         if i == 0:
-            cur_pose = gt_pose
+            cur_pose = vo.gt_poses[0]
         else:
             q1, q2 = vo.get_matches(i)
             transf = vo.get_pose(q1, q2)
             cur_pose = np.matmul(cur_pose, np.linalg.inv(transf))
-        gt_path.append((gt_pose[0, 3], gt_pose[2, 3]))
+        # gt_path.append((gt_pose[0, 3], gt_pose[2, 3]))
         estimated_path.append((cur_pose[0, 3], cur_pose[2, 3]))
-    plotting.visualize_paths(gt_path, estimated_path, "Visual Odometry", file_out=os.path.basename(data_dir) + ".html")
+    # plotting.visualize_paths(gt_path, estimated_path, "Visual Odometry", file_out=os.path.basename(data_dir) + ".html")
 
 
 if __name__ == "__main__":
