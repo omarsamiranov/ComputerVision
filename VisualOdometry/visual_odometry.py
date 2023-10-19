@@ -223,6 +223,15 @@ class VisualOdometry():
 
         return [R1, t]
 
+def variance_of_laplacian(image):
+	return cv2.Laplacian(image, cv2.CV_64F).var()
+
+
+def sharpness(gray):
+	# image = cv2.imread(imagePath)
+	# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	fm = variance_of_laplacian(gray)
+	return fm
 
 def main():
     data_dir = "video"  # Try KITTI_sequence_2 too
@@ -250,6 +259,7 @@ def main():
             estimated_path.append((cur_pose[0, 3], cur_pose[2, 3]))
             print(type(cur_pose))
             print(cur_pose)
+            print(f"sharpness: {sharpness(vo.images[i])}")
             print()
         except:
           print(f"error in frame {i}")
